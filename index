@@ -1,11 +1,1473 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Mi sitio en GitHub Pages</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RETRO CORE — Hardware Clásico, Poder Moderno</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #00ff41;
+    --green-dim: #00b32c;
+    --green-dark: #003d0f;
+    --amber: #ffb000;
+    --amber-dim: #cc8800;
+    --red: #ff3333;
+    --bg: #030a03;
+    --bg2: #060f06;
+    --card: #0a160a;
+    --border: #1a3d1a;
+    --text: #c8ffc8;
+    --text-dim: #6abf6a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    overflow-x: hidden;
+    cursor: crosshair;
+  }
+
+  /* ── CRT OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.18) 2px,
+      rgba(0,0,0,0.18) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.7) 100%);
+    pointer-events: none;
+    z-index: 9998;
+  }
+
+  /* ── NOISE TEXTURE ── */
+  @keyframes noise {
+    0%   { background-position: 0 0; }
+    100% { background-position: 200px 200px; }
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes blink { 50% { opacity: 0; } }
+  @keyframes glow-pulse {
+    0%, 100% { text-shadow: 0 0 5px var(--green), 0 0 10px var(--green); }
+    50%       { text-shadow: 0 0 20px var(--green), 0 0 40px var(--green), 0 0 80px var(--green); }
+  }
+  @keyframes scanline {
+    0%   { top: -10%; }
+    100% { top: 110%; }
+  }
+  @keyframes glitch {
+    0%  { clip-path: inset(0 0 98% 0); transform: translate(-4px, 0); }
+    10% { clip-path: inset(40% 0 40% 0); transform: translate(4px, 0); }
+    20% { clip-path: inset(80% 0 0 0); transform: translate(-4px, 0); }
+    30% { clip-path: inset(0 0 0 0); transform: translate(0, 0); }
+    100%{ clip-path: inset(0 0 0 0); transform: translate(0, 0); }
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+  @keyframes flicker {
+    0%,19%,21%,23%,25%,54%,56%,100% { opacity: 1; }
+    20%,22%,24%,55% { opacity: 0.4; }
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--green-dim); }
+
+  /* ══════════════════════════════
+         TOP BAR
+  ══════════════════════════════ */
+  .topbar {
+    background: var(--green-dark);
+    border-bottom: 1px solid var(--green-dim);
+    padding: 6px 2rem;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    color: var(--green-dim);
+    animation: flicker 8s infinite;
+  }
+  .topbar span { animation: blink 1.2s step-start infinite; }
+
+  /* ══════════════════════════════
+         NAV
+  ══════════════════════════════ */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(3,10,3,0.95);
+    border-bottom: 2px solid var(--green);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 0 30px rgba(0,255,65,0.2);
+  }
+
+  .logo {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: 1.4rem;
+    color: var(--green);
+    text-shadow: 0 0 20px var(--green), 0 0 40px var(--green);
+    padding: 1rem 0;
+    letter-spacing: 4px;
+    animation: glow-pulse 3s ease-in-out infinite;
+    text-decoration: none;
+  }
+  .logo span { color: var(--amber); text-shadow: 0 0 20px var(--amber); }
+
+  .nav-links {
+    display: flex;
+    gap: 0;
+    list-style: none;
+  }
+  .nav-links a {
+    display: block;
+    padding: 1.2rem 1.1rem;
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 0.72rem;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+    border-bottom: 3px solid transparent;
+    position: relative;
+  }
+  .nav-links a:hover {
+    color: var(--green);
+    border-bottom-color: var(--green);
+    text-shadow: 0 0 10px var(--green);
+    background: rgba(0,255,65,0.05);
+  }
+
+  .nav-actions { display: flex; align-items: center; gap: 1rem; }
+  .btn-cart {
+    background: transparent;
+    border: 1px solid var(--green);
+    color: var(--green);
+    padding: 0.5rem 1rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 2px;
+  }
+  .btn-cart:hover {
+    background: var(--green);
+    color: var(--bg);
+    box-shadow: 0 0 20px var(--green);
+  }
+
+  /* ══════════════════════════════
+         HERO
+  ══════════════════════════════ */
+  .hero {
+    position: relative;
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    padding: 4rem 2rem;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 70% 50%, rgba(0,255,65,0.06) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 40% at 20% 80%, rgba(255,176,0,0.04) 0%, transparent 60%),
+      var(--bg);
+  }
+
+  /* Grid lines */
+  .hero-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,255,65,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,65,0.04) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+
+  /* Moving scanline */
+  .hero-bg::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(transparent, rgba(0,255,65,0.3), transparent);
+    animation: scanline 4s linear infinite;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 700px;
+    animation: fadeInUp 0.8s ease both;
+  }
+
+  .hero-badge {
+    display: inline-block;
+    border: 1px solid var(--amber);
+    color: var(--amber);
+    font-size: 0.65rem;
+    padding: 0.3rem 0.8rem;
+    letter-spacing: 3px;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 0 10px var(--amber);
+    box-shadow: 0 0 10px rgba(255,176,0,0.2);
+  }
+
+  .hero h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 900;
+    line-height: 1.1;
+    color: var(--green);
+    text-shadow: 0 0 30px rgba(0,255,65,0.5);
+    margin-bottom: 1rem;
+  }
+
+  .hero h1 .glitch {
+    position: relative;
+    display: inline-block;
+  }
+  .hero h1 .glitch::before {
+    content: attr(data-text);
+    position: absolute;
+    left: 2px;
+    color: var(--amber);
+    clip-path: inset(0 0 0 0);
+    animation: glitch 5s infinite;
+    opacity: 0.6;
+  }
+
+  .hero-sub {
+    font-size: 1rem;
+    color: var(--text-dim);
+    line-height: 1.7;
+    margin-bottom: 2rem;
+    max-width: 560px;
+  }
+
+  .terminal-line {
+    font-size: 0.8rem;
+    color: var(--green-dim);
+    margin-bottom: 0.3rem;
+  }
+  .terminal-line::before { content: '> '; color: var(--green); }
+  .cursor::after {
+    content: '█';
+    animation: blink 0.8s step-start infinite;
+    color: var(--green);
+  }
+
+  .hero-btns { display: flex; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; }
+
+  .btn-primary {
+    background: var(--green);
+    color: var(--bg);
+    border: none;
+    padding: 0.9rem 2rem;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.2s;
+    box-shadow: 0 0 20px rgba(0,255,65,0.4);
+  }
+  .btn-primary:hover {
+    background: #00ff41cc;
+    box-shadow: 0 0 40px rgba(0,255,65,0.8);
+    transform: translateY(-2px);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--amber);
+    border: 1px solid var(--amber);
+    padding: 0.9rem 2rem;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.2s;
+  }
+  .btn-secondary:hover {
+    background: rgba(255,176,0,0.1);
+    box-shadow: 0 0 20px rgba(255,176,0,0.4);
+    transform: translateY(-2px);
+  }
+
+  .hero-stats {
+    position: absolute;
+    right: 3rem;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    z-index: 2;
+  }
+
+  .stat-box {
+    border: 1px solid var(--border);
+    padding: 1rem 1.5rem;
+    text-align: center;
+    background: rgba(0,255,65,0.03);
+    transition: all 0.3s;
+    animation: fadeInUp 0.8s ease both;
+  }
+  .stat-box:hover {
+    border-color: var(--green);
+    box-shadow: 0 0 20px rgba(0,255,65,0.2);
+    background: rgba(0,255,65,0.06);
+  }
+  .stat-num {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--green);
+    text-shadow: 0 0 15px var(--green);
+    display: block;
+  }
+  .stat-label { font-size: 0.6rem; color: var(--text-dim); letter-spacing: 2px; margin-top: 0.3rem; }
+
+  /* ══════════════════════════════
+         TICKER
+  ══════════════════════════════ */
+  .ticker {
+    background: var(--green);
+    color: var(--bg);
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 0.5rem 0;
+    font-size: 0.7rem;
+    font-family: 'Share Tech Mono', monospace;
+    letter-spacing: 2px;
+  }
+  .ticker-inner {
+    display: inline-block;
+    animation: ticker-scroll 30s linear infinite;
+  }
+  @keyframes ticker-scroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  /* ══════════════════════════════
+         SECTIONS COMMON
+  ══════════════════════════════ */
+  section { padding: 5rem 2rem; }
+  .section-header { text-align: center; margin-bottom: 3.5rem; }
+  .section-tag {
+    display: inline-block;
+    font-size: 0.65rem;
+    letter-spacing: 4px;
+    color: var(--amber);
+    border: 1px solid var(--amber-dim);
+    padding: 0.25rem 0.8rem;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+  }
+  .section-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    font-weight: 900;
+    color: var(--green);
+    text-shadow: 0 0 20px rgba(0,255,65,0.3);
+    margin-bottom: 0.8rem;
+  }
+  .section-desc { color: var(--text-dim); font-size: 0.9rem; max-width: 500px; margin: 0 auto; line-height: 1.7; }
+
+  /* ══════════════════════════════
+         CATEGORIES
+  ══════════════════════════════ */
+  .categories { background: var(--bg2); }
+
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5px;
+    max-width: 1200px;
+    margin: 0 auto;
+    border: 1.5px solid var(--border);
+  }
+
+  .cat-card {
+    background: var(--card);
+    padding: 2rem 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 1px solid transparent;
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+  .cat-card::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--green);
+    transform: scaleX(0);
+    transition: transform 0.3s;
+  }
+  .cat-card:hover { background: rgba(0,255,65,0.05); border-color: var(--green-dim); }
+  .cat-card:hover::before { transform: scaleX(1); }
+  .cat-card:hover .cat-icon { animation: spin-slow 1s linear; color: var(--green); text-shadow: 0 0 20px var(--green); }
+
+  .cat-icon {
+    font-size: 2.2rem;
+    display: block;
+    margin-bottom: 1rem;
+    transition: all 0.3s;
+  }
+  .cat-name {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-bottom: 0.4rem;
+    color: var(--text);
+  }
+  .cat-count { font-size: 0.65rem; color: var(--text-dim); }
+
+  /* ══════════════════════════════
+         FEATURED PRODUCTS
+  ══════════════════════════════ */
+  .products { background: var(--bg); }
+
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .product-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 0;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .product-card:hover {
+    border-color: var(--green);
+    box-shadow: 0 0 30px rgba(0,255,65,0.15), inset 0 0 30px rgba(0,255,65,0.03);
+    transform: translateY(-4px);
+  }
+
+  .product-badge {
+    position: absolute;
+    top: 1rem; right: 1rem;
+    background: var(--amber);
+    color: var(--bg);
+    font-size: 0.55rem;
+    letter-spacing: 2px;
+    padding: 0.2rem 0.5rem;
+    font-weight: bold;
+    z-index: 2;
+  }
+  .product-badge.new { background: var(--green); color: var(--bg); }
+  .product-badge.hot { background: var(--red); color: #fff; }
+
+  .product-img {
+    background: #050f05;
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .product-img::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(0,255,65,0.08) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .product-card:hover .product-img::after { opacity: 1; }
+
+  .product-info { padding: 1.2rem; }
+  .product-compat {
+    font-size: 0.6rem;
+    color: var(--amber);
+    letter-spacing: 2px;
+    margin-bottom: 0.4rem;
+    text-transform: uppercase;
+  }
+  .product-name {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+    color: var(--text);
+  }
+  .product-desc { font-size: 0.72rem; color: var(--text-dim); line-height: 1.6; margin-bottom: 1rem; }
+  .product-specs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-bottom: 1rem;
+  }
+  .spec-tag {
+    background: rgba(0,255,65,0.08);
+    border: 1px solid var(--green-dark);
+    color: var(--green-dim);
+    font-size: 0.58rem;
+    padding: 0.2rem 0.5rem;
+    letter-spacing: 1px;
+  }
+  .product-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 0.8rem;
+    border-top: 1px solid var(--border);
+  }
+  .product-price {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    font-weight: 900;
+    color: var(--green);
+    text-shadow: 0 0 10px rgba(0,255,65,0.4);
+  }
+  .product-price-old {
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    text-decoration: line-through;
+    margin-left: 0.3rem;
+  }
+  .btn-add {
+    background: transparent;
+    border: 1px solid var(--green-dim);
+    color: var(--green);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+  }
+  .btn-add:hover {
+    background: var(--green);
+    color: var(--bg);
+    box-shadow: 0 0 15px rgba(0,255,65,0.5);
+  }
+
+  /* ══════════════════════════════
+         WHY SECTION
+  ══════════════════════════════ */
+  .why-section {
+    background: linear-gradient(135deg, var(--bg2) 0%, rgba(0,30,0,0.8) 100%);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .why-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    align-items: center;
+  }
+  .terminal-box {
+    background: #010801;
+    border: 1px solid var(--green-dim);
+    padding: 1.5rem;
+    font-size: 0.72rem;
+    line-height: 2;
+    box-shadow: 0 0 30px rgba(0,255,65,0.1), inset 0 0 30px rgba(0,0,0,0.5);
+    position: relative;
+  }
+  .terminal-box::before {
+    content: 'BENCHMARK_RESULTS.LOG';
+    position: absolute;
+    top: -0.6rem;
+    left: 1rem;
+    background: var(--bg2);
+    padding: 0 0.5rem;
+    font-size: 0.6rem;
+    color: var(--green-dim);
+    letter-spacing: 2px;
+  }
+  .t-line { color: var(--text-dim); padding: 0.1rem 0; }
+  .t-line.good { color: var(--green); }
+  .t-line.warn { color: var(--amber); }
+  .t-line.head { color: var(--green); font-weight: bold; border-bottom: 1px solid var(--green-dark); margin-bottom: 0.5rem; padding-bottom: 0.5rem; }
+  .t-bar {
+    display: inline-block;
+    height: 8px;
+    background: var(--green);
+    margin-right: 0.5rem;
+    vertical-align: middle;
+    box-shadow: 0 0 6px var(--green);
+  }
+  .t-bar.old { background: var(--amber-dim); box-shadow: none; }
+
+  .why-points { display: flex; flex-direction: column; gap: 1.5rem; }
+  .why-point {
+    display: flex;
+    gap: 1.2rem;
+    align-items: flex-start;
+    padding: 1.2rem;
+    border: 1px solid var(--border);
+    background: rgba(0,255,65,0.02);
+    transition: all 0.3s;
+  }
+  .why-point:hover {
+    border-color: var(--green-dim);
+    background: rgba(0,255,65,0.05);
+  }
+  .why-icon {
+    font-size: 1.8rem;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+  .why-text h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.75rem;
+    color: var(--green);
+    margin-bottom: 0.4rem;
+    letter-spacing: 1px;
+  }
+  .why-text p { font-size: 0.75rem; color: var(--text-dim); line-height: 1.7; }
+
+  /* ══════════════════════════════
+         COMPATIBILITY TOOL
+  ══════════════════════════════ */
+  .compat-section { background: var(--bg); }
+  .compat-box {
+    max-width: 700px;
+    margin: 0 auto;
+    border: 1px solid var(--green-dim);
+    background: var(--card);
+    padding: 2rem;
+    box-shadow: 0 0 40px rgba(0,255,65,0.1);
+  }
+  .compat-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.75rem;
+    color: var(--green);
+    margin-bottom: 1.5rem;
+    letter-spacing: 2px;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .compat-title::before { content: '> '; color: var(--amber); }
+  .compat-form { display: flex; flex-direction: column; gap: 1rem; }
+  .compat-label { font-size: 0.68rem; color: var(--text-dim); letter-spacing: 2px; margin-bottom: 0.3rem; display: block; }
+  .compat-select, .compat-input {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.7rem 1rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.78rem;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.2s;
+    appearance: none;
+  }
+  .compat-select:focus, .compat-input:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 10px rgba(0,255,65,0.2);
+  }
+  .compat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .compat-result {
+    background: var(--bg);
+    border: 1px solid var(--green);
+    padding: 1rem;
+    font-size: 0.72rem;
+    color: var(--green);
+    line-height: 1.8;
+    display: none;
+    margin-top: 0.5rem;
+  }
+  .compat-result.show { display: block; animation: fadeInUp 0.3s ease; }
+
+  /* ══════════════════════════════
+         BRANDS
+  ══════════════════════════════ */
+  .brands-section { background: var(--bg2); padding: 3rem 2rem; }
+  .brands-title { text-align: center; font-size: 0.65rem; color: var(--text-dim); letter-spacing: 4px; margin-bottom: 2rem; }
+  .brands-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 3rem;
+    flex-wrap: wrap;
+    opacity: 0.5;
+    filter: grayscale(1);
+    transition: all 0.3s;
+  }
+  .brands-row:hover { opacity: 0.9; filter: none; }
+  .brand {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+  }
+
+  /* ══════════════════════════════
+         NEWSLETTER
+  ══════════════════════════════ */
+  .newsletter {
+    background: radial-gradient(ellipse at center, rgba(0,255,65,0.05) 0%, transparent 70%), var(--bg2);
+    border-top: 1px solid var(--border);
+    text-align: center;
+    padding: 5rem 2rem;
+  }
+  .newsletter h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.5rem;
+    color: var(--green);
+    text-shadow: 0 0 20px rgba(0,255,65,0.4);
+    margin-bottom: 0.8rem;
+  }
+  .newsletter p { color: var(--text-dim); font-size: 0.85rem; margin-bottom: 2rem; }
+  .newsletter-form {
+    display: flex;
+    max-width: 500px;
+    margin: 0 auto;
+    gap: 0;
+    border: 1px solid var(--green-dim);
+    box-shadow: 0 0 20px rgba(0,255,65,0.1);
+  }
+  .newsletter-form input {
+    flex: 1;
+    background: var(--bg);
+    border: none;
+    color: var(--text);
+    padding: 0.9rem 1.2rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem;
+    outline: none;
+  }
+  .newsletter-form button {
+    background: var(--green);
+    color: var(--bg);
+    border: none;
+    padding: 0.9rem 1.5rem;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 2px;
+    transition: all 0.2s;
+  }
+  .newsletter-form button:hover {
+    background: #00cc33;
+    box-shadow: 0 0 20px rgba(0,255,65,0.5);
+  }
+
+  /* ══════════════════════════════
+         FOOTER
+  ══════════════════════════════ */
+  footer {
+    background: #010a01;
+    border-top: 2px solid var(--green-dark);
+    padding: 4rem 2rem 2rem;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 3rem;
+    max-width: 1200px;
+    margin: 0 auto 3rem;
+  }
+  .footer-brand .logo { font-size: 1rem; }
+  .footer-tagline { font-size: 0.72rem; color: var(--text-dim); line-height: 1.7; margin-top: 1rem; }
+  .footer-social { display: flex; gap: 0.5rem; margin-top: 1.2rem; }
+  .social-btn {
+    width: 36px; height: 36px;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    color: var(--text-dim);
+  }
+  .social-btn:hover { border-color: var(--green); color: var(--green); box-shadow: 0 0 10px rgba(0,255,65,0.3); }
+  .footer-col h4 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.65rem;
+    color: var(--green);
+    letter-spacing: 3px;
+    margin-bottom: 1.2rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .footer-col ul { list-style: none; }
+  .footer-col li { margin-bottom: 0.6rem; }
+  .footer-col a {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-col a:hover { color: var(--green); }
+  .footer-bottom {
+    border-top: 1px solid var(--border);
+    padding-top: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    .hero-stats { display: none; }
+    .why-grid { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .compat-row { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .nav-links { display: none; }
+    .footer-grid { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 1.6rem; }
+    .hero-btns { flex-direction: column; }
+  }
+</style>
 </head>
 <body>
-    <h1>¡Hola mundo!</h1>
-    <p>Este es mi primer sitio con GitHub Pages.</p>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <span>⚡ ENVÍO GRATIS en pedidos +$50 USD</span>
+  <span>SOPORTE TÉCNICO: MON–SAT 9AM–7PM ▐█▌ 24/7 ONLINE</span>
+  <span>🌎 ENVÍOS A LATAM <span>■</span></span>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">RETRO<span>CORE</span></a>
+  <ul class="nav-links">
+    <li><a href="#categorias">CATEGORÍAS</a></li>
+    <li><a href="#productos">PRODUCTOS</a></li>
+    <li><a href="#compatibilidad">COMPATIBILIDAD</a></li>
+    <li><a href="#por-que">¿POR QUÉ UPGRADEAR?</a></li>
+    <li><a href="#nosotros">NOSOTROS</a></li>
+  </ul>
+  <div class="nav-actions">
+    <button class="btn-cart">🛒 CARRITO [0]</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="inicio">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="hero-badge">★ HARDWARE RETRO — UPGRADE MODERNO ★</div>
+    <h1>
+      <span class="glitch" data-text="DALE VIDA">DALE VIDA</span><br>
+      A TU CLÁSICO.
+    </h1>
+    <p class="hero-sub">
+      Tu Pentium, tu Mac G4, tu 486 — merecen una segunda oportunidad.
+      Upgrades reales: SSDs que vuelan, redes gigabit, gráficas que sorprenden.
+    </p>
+    <div class="terminal-line">CARGANDO CATÁLOGO DE UPGRADES...</div>
+    <div class="terminal-line">512 PRODUCTOS ENCONTRADOS</div>
+    <div class="terminal-line cursor">SISTEMA LISTO</div>
+    <div class="hero-btns">
+      <a href="#productos" class="btn-primary">VER CATÁLOGO</a>
+      <a href="#compatibilidad" class="btn-secondary">CHECK COMPATIBILIDAD</a>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div class="stat-box" style="animation-delay:0.2s">
+      <span class="stat-num">512+</span>
+      <div class="stat-label">PRODUCTOS</div>
+    </div>
+    <div class="stat-box" style="animation-delay:0.4s">
+      <span class="stat-num">98%</span>
+      <div class="stat-label">SATISFACCIÓN</div>
+    </div>
+    <div class="stat-box" style="animation-delay:0.6s">
+      <span class="stat-num">15K</span>
+      <div class="stat-label">CLIENTES</div>
+    </div>
+    <div class="stat-box" style="animation-delay:0.8s">
+      <span class="stat-num">10X</span>
+      <div class="stat-label">MÁS RÁPIDO</div>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner">
+    ★ IDE→SATA ADAPTERS EN STOCK &nbsp;│&nbsp; ★ COMPACT FLASH COMO SSD PARA TU 486 &nbsp;│&nbsp; ★ TARJETAS ISA DISPONIBLES &nbsp;│&nbsp; ★ FUENTES ATX PARA GABINETES AT &nbsp;│&nbsp; ★ ENVÍO 48H &nbsp;│&nbsp; ★ RAM EDO Y SIMM EN STOCK &nbsp;│&nbsp; ★ SOPORTE TÉCNICO ESPECIALIZADO &nbsp;│&nbsp; ★ IDE→SATA ADAPTERS EN STOCK &nbsp;│&nbsp; ★ COMPACT FLASH COMO SSD PARA TU 486 &nbsp;│&nbsp; ★ TARJETAS ISA DISPONIBLES &nbsp;│&nbsp; ★ FUENTES ATX PARA GABINETES AT &nbsp;│&nbsp; ★ ENVÍO 48H &nbsp;│&nbsp; ★ RAM EDO Y SIMM EN STOCK &nbsp;│&nbsp; ★ SOPORTE TÉCNICO ESPECIALIZADO &nbsp;│&nbsp;
+  </div>
+</div>
+
+<!-- CATEGORIES -->
+<section class="categories" id="categorias">
+  <div class="section-header">
+    <div class="section-tag">// DIRECTORIO DEL SISTEMA</div>
+    <h2 class="section-title">CATEGORÍAS</h2>
+    <p class="section-desc">Todo lo que necesitas para resucitar y potenciar tu máquina clásica.</p>
+  </div>
+  <div class="cat-grid">
+    <a href="#" class="cat-card">
+      <span class="cat-icon">💾</span>
+      <div class="cat-name">ALMACENAMIENTO SSD</div>
+      <div class="cat-count">47 productos</div>
+    </a>
+    <a href="#" class="cat-card">
+      <span class="cat-icon">🌐</span>
+      <div class="cat-name">TARJETAS DE RED</div>
+      <div class="cat-count">32 productos</div>
+    </a>
+    <a href="#" class="cat-card">
+      <span class="cat-icon">🎮</span>
+      <div class="cat-name">TARJETAS DE VIDEO</div>
+      <div class="cat-count">58 productos</div>
+    </a>
+    <a href="#" class="cat-card">
+      <span class="cat-icon">⚡</span>
+      <div class="cat-name">FUENTES DE PODER</div>
+      <div class="cat-count">29 productos</div>
+    </a>
+    <a href="#" class="cat-card">
+      <span class="cat-icon">🧠</span>
+      <div class="cat-name">MEMORIA RAM</div>
+      <div class="cat-count">84 productos</div>
+    </a>
+    <a href="#" class="cat-card">
+      <span class="cat-icon">🔌</span>
+      <div class="cat-name">CABLES Y ADAPTADORES</div>
+      <div class="cat-count">123 productos</div>
+    </a>
+    <a href="#" class="cat-card">
+      <span class="cat-icon">🌡️</span>
+      <div class="cat-name">COOLING & FANS</div>
+      <div class="cat-count">41 productos</div>
+    </a>
+    <a href="#" class="cat-card">
+      <span class="cat-icon">🔧</span>
+      <div class="cat-name">PROCESADORES</div>
+      <div class="cat-count">36 productos</div>
+    </a>
+    <a href="#" class="cat-card">
+      <span class="cat-icon">📺</span>
+      <div class="cat-name">CONVERSORES HDMI/VGA</div>
+      <div class="cat-count">22 productos</div>
+    </a>
+    <a href="#" class="cat-card">
+      <span class="cat-icon">🖨️</span>
+      <div class="cat-name">I/O: USB, SERIAL, PS2</div>
+      <div class="cat-count">67 productos</div>
+    </a>
+    <a href="#" class="cat-card">
+      <span class="cat-icon">💿</span>
+      <div class="cat-name">PLACAS MADRE</div>
+      <div class="cat-count">18 productos</div>
+    </a>
+    <a href="#" class="cat-card">
+      <span class="cat-icon">🔊</span>
+      <div class="cat-name">TARJETAS DE SONIDO</div>
+      <div class="cat-count">25 productos</div>
+    </a>
+  </div>
+</section>
+
+<!-- PRODUCTS -->
+<section class="products" id="productos">
+  <div class="section-header">
+    <div class="section-tag">// FEATURED_ITEMS.DAT</div>
+    <h2 class="section-title">PRODUCTOS DESTACADOS</h2>
+    <p class="section-desc">Los upgrades más buscados por nuestra comunidad retro.</p>
+  </div>
+  <div class="product-grid">
+
+    <!-- Product 1 -->
+    <div class="product-card">
+      <div class="product-badge new">NUEVO</div>
+      <div class="product-img">💾</div>
+      <div class="product-info">
+        <div class="product-compat">IDE / PATA 44-pin</div>
+        <div class="product-name">KIT SSD-CF 128GB CON ADAPTADOR IDE→CF</div>
+        <div class="product-desc">Reemplaza tu disco duro IDE por una tarjeta CompactFlash de alta velocidad. Ideal para portátiles retro y desktops Socket 7.</div>
+        <div class="product-specs">
+          <span class="spec-tag">128 GB</span>
+          <span class="spec-tag">Sin partes móviles</span>
+          <span class="spec-tag">IDE 44-pin</span>
+          <span class="spec-tag">DOS / Win98</span>
+        </div>
+        <div class="product-footer">
+          <div>
+            <span class="product-price">$24.99</span>
+            <span class="product-price-old">$34.99</span>
+          </div>
+          <button class="btn-add">+ AGREGAR</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product 2 -->
+    <div class="product-card">
+      <div class="product-badge hot">POPULAR</div>
+      <div class="product-img">🌐</div>
+      <div class="product-info">
+        <div class="product-compat">PCI / ISA</div>
+        <div class="product-name">TARJETA DE RED GIGABIT 10/100/1000 PCI</div>
+        <div class="product-desc">Conecta tu PC vintage a redes modernas. Chipset Realtek RTL8169 con drivers para DOS, Windows 95 y NT 4.0.</div>
+        <div class="product-specs">
+          <span class="spec-tag">1 Gbps</span>
+          <span class="spec-tag">PCI 32-bit</span>
+          <span class="spec-tag">Win95/98/XP</span>
+          <span class="spec-tag">DOS drivers</span>
+        </div>
+        <div class="product-footer">
+          <div>
+            <span class="product-price">$18.50</span>
+          </div>
+          <button class="btn-add">+ AGREGAR</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product 3 -->
+    <div class="product-card">
+      <div class="product-img">🎮</div>
+      <div class="product-info">
+        <div class="product-compat">AGP 4X / 8X</div>
+        <div class="product-name">RADEON 9250 AGP 128MB DDR — NUEVA VIEJA STOCK</div>
+        <div class="product-desc">Última generación AGP. Perfecta para Windows XP gaming. Salida VGA + S-Video. Compatible con DirectX 8.1.</div>
+        <div class="product-specs">
+          <span class="spec-tag">128 MB DDR</span>
+          <span class="spec-tag">AGP 8X</span>
+          <span class="spec-tag">DirectX 8.1</span>
+          <span class="spec-tag">NOS</span>
+        </div>
+        <div class="product-footer">
+          <div>
+            <span class="product-price">$39.00</span>
+            <span class="product-price-old">$55.00</span>
+          </div>
+          <button class="btn-add">+ AGREGAR</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product 4 -->
+    <div class="product-card">
+      <div class="product-badge">OFERTA</div>
+      <div class="product-img">⚡</div>
+      <div class="product-info">
+        <div class="product-compat">AT / ATX Moderno</div>
+        <div class="product-name">FUENTE ATX→AT ADAPTADOR + PSU 250W 80 PLUS</div>
+        <div class="product-desc">Fuente moderna silenciosa con adaptador AT. Protección contra sobrecorriente. Ideal para 486 y Pentium MMX.</div>
+        <div class="product-specs">
+          <span class="spec-tag">250W</span>
+          <span class="spec-tag">80 PLUS</span>
+          <span class="spec-tag">Silenciosa</span>
+          <span class="spec-tag">Adaptador AT</span>
+        </div>
+        <div class="product-footer">
+          <div>
+            <span class="product-price">$44.99</span>
+          </div>
+          <button class="btn-add">+ AGREGAR</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product 5 -->
+    <div class="product-card">
+      <div class="product-img">🧠</div>
+      <div class="product-info">
+        <div class="product-compat">SIMM 72-pin</div>
+        <div class="product-name">RAM EDO 32MB SIMM 72-PIN — TESTED</div>
+        <div class="product-desc">Memoria EDO testeada individualmente. Compatible con Pentium 100–233 MHz. Expande tu sistema hasta 128MB.</div>
+        <div class="product-specs">
+          <span class="spec-tag">32 MB</span>
+          <span class="spec-tag">EDO 60ns</span>
+          <span class="spec-tag">72-pin</span>
+          <span class="spec-tag">TESTEADA</span>
+        </div>
+        <div class="product-footer">
+          <div>
+            <span class="product-price">$12.00</span>
+          </div>
+          <button class="btn-add">+ AGREGAR</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product 6 -->
+    <div class="product-card">
+      <div class="product-badge new">NUEVO</div>
+      <div class="product-img">📺</div>
+      <div class="product-info">
+        <div class="product-compat">VGA → HDMI</div>
+        <div class="product-name">CONVERSOR VGA/CGA/EGA → HDMI CON ESCALADO 1080P</div>
+        <div class="product-desc">Conecta tu PC retro a pantallas modernas. Escalado de imagen, corrección de relación de aspecto y filtros CRT opcionales.</div>
+        <div class="product-specs">
+          <span class="spec-tag">1080p output</span>
+          <span class="spec-tag">VGA/CGA/EGA</span>
+          <span class="spec-tag">Filtro CRT</span>
+          <span class="spec-tag">Plug&Play</span>
+        </div>
+        <div class="product-footer">
+          <div>
+            <span class="product-price">$32.00</span>
+            <span class="product-price-old">$45.00</span>
+          </div>
+          <button class="btn-add">+ AGREGAR</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- COMPATIBILITY TOOL -->
+<section class="compat-section" id="compatibilidad">
+  <div class="section-header">
+    <div class="section-tag">// HERRAMIENTA INTERACTIVA</div>
+    <h2 class="section-title">CHECK DE COMPATIBILIDAD</h2>
+    <p class="section-desc">Ingresa los datos de tu equipo y te decimos qué upgrades son compatibles.</p>
+  </div>
+  <div class="compat-box">
+    <div class="compat-title">ANALIZADOR DE HARDWARE RETRO v2.1</div>
+    <div class="compat-form">
+      <div class="compat-row">
+        <div>
+          <label class="compat-label">ARQUITECTURA</label>
+          <select class="compat-select" id="arch">
+            <option value="">-- SELECCIONAR --</option>
+            <option>8086 / 8088</option>
+            <option>286</option>
+            <option>386</option>
+            <option>486</option>
+            <option>Pentium / Socket 7</option>
+            <option>Pentium II / III (Slot 1)</option>
+            <option>Pentium 4 / Socket 478</option>
+            <option>Athlon / Socket A</option>
+            <option>Athlon 64 / Socket 754/939</option>
+            <option>Apple Mac G3 / G4 / G5</option>
+          </select>
+        </div>
+        <div>
+          <label class="compat-label">BUS PRINCIPAL</label>
+          <select class="compat-select" id="bus">
+            <option value="">-- SELECCIONAR --</option>
+            <option>ISA 8-bit</option>
+            <option>ISA 16-bit</option>
+            <option>VESA Local Bus</option>
+            <option>PCI 32-bit</option>
+            <option>AGP</option>
+            <option>PCIe x1/x4/x16</option>
+          </select>
+        </div>
+      </div>
+      <div class="compat-row">
+        <div>
+          <label class="compat-label">ALMACENAMIENTO ACTUAL</label>
+          <select class="compat-select" id="storage">
+            <option value="">-- SELECCIONAR --</option>
+            <option>MFM / RLL</option>
+            <option>IDE / PATA 40-pin</option>
+            <option>IDE / PATA 44-pin (portátil)</option>
+            <option>SCSI</option>
+            <option>SATA I / II</option>
+          </select>
+        </div>
+        <div>
+          <label class="compat-label">SISTEMA OPERATIVO</label>
+          <select class="compat-select" id="os">
+            <option value="">-- SELECCIONAR --</option>
+            <option>MS-DOS / FreeDOS</option>
+            <option>Windows 3.x</option>
+            <option>Windows 95 / 98 / Me</option>
+            <option>Windows NT / 2000</option>
+            <option>Windows XP</option>
+            <option>Linux antiguo (kernel &lt;2.6)</option>
+            <option>Mac OS 9 / Classic</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-primary" style="width:100%;margin-top:0.5rem" onclick="checkCompat()">
+        ▶ ANALIZAR COMPATIBILIDAD
+      </button>
+      <div class="compat-result" id="compatResult"></div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY SECTION -->
+<section class="why-section" id="por-que">
+  <div class="section-header">
+    <div class="section-tag">// README.TXT</div>
+    <h2 class="section-title">¿POR QUÉ UPGRADEAR?</h2>
+  </div>
+  <div class="why-grid">
+    <div class="terminal-box">
+      <div class="t-line head">BENCHMARK: IBM 486DX2-66 ANTES vs DESPUÉS</div>
+      <div class="t-line warn">DISCO DURO ORIGINAL (HDD 540MB IDE)</div>
+      <div class="t-line">Velocidad lectura: <span class="t-bar old" style="width:40px"></span> 2.1 MB/s</div>
+      <div class="t-line">Boot time:         <span class="t-bar old" style="width:70px"></span> 3m 20s</div>
+      <div class="t-line">&nbsp;</div>
+      <div class="t-line good">DESPUÉS: SSD-CF 64GB + ADAPTADOR IDE</div>
+      <div class="t-line">Velocidad lectura: <span class="t-bar" style="width:120px"></span> 12.8 MB/s</div>
+      <div class="t-line">Boot time:         <span class="t-bar" style="width:30px"></span> 42s</div>
+      <div class="t-line">&nbsp;</div>
+      <div class="t-line good">RED ORIGINAL (10BASE-T)</div>
+      <div class="t-line">Transferencia LAN: <span class="t-bar old" style="width:20px"></span> 0.9 MB/s</div>
+      <div class="t-line good">TARJETA GIGABIT PCI</div>
+      <div class="t-line">Transferencia LAN: <span class="t-bar" style="width:100px"></span> 98 MB/s</div>
+      <div class="t-line">&nbsp;</div>
+      <div class="t-line warn">> RESULTADO: MÁQUINA 6X MÁS RÁPIDA ✓</div>
+    </div>
+    <div class="why-points">
+      <div class="why-point">
+        <div class="why-icon">♻️</div>
+        <div class="why-text">
+          <h3>SOSTENIBILIDAD REAL</h3>
+          <p>Extender la vida útil de hardware existente reduce la generación de e-waste. Tu Pentium puede durar otras dos décadas.</p>
+        </div>
+      </div>
+      <div class="why-point">
+        <div class="why-icon">💰</div>
+        <div class="why-text">
+          <h3>COSTO-EFECTIVO</h3>
+          <p>Un upgrade de $30 puede transformar un equipo de $5 en una máquina útil para tareas específicas, servidores, o colección funcionando.</p>
+        </div>
+      </div>
+      <div class="why-point">
+        <div class="why-icon">🎯</div>
+        <div class="why-text">
+          <h3>RENDIMIENTO ESPECÍFICO</h3>
+          <p>Los equipos retro corren software clásico a velocidades perfectas. Un 486 overclocked con SSD es una máquina DOS imparable.</p>
+        </div>
+      </div>
+      <div class="why-point">
+        <div class="why-icon">🏛️</div>
+        <div class="why-text">
+          <h3>PRESERVACIÓN HISTÓRICA</h3>
+          <p>Mantener hardware en funcionamiento preserva la historia de la computación. Cada máquina es un artefacto cultural.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BRANDS -->
+<div class="brands-section">
+  <div class="brands-title">HARDWARE QUE MANEJAMOS</div>
+  <div class="brands-row">
+    <span class="brand">IBM</span>
+    <span class="brand">COMPAQ</span>
+    <span class="brand">INTEL</span>
+    <span class="brand">AMD</span>
+    <span class="brand">SEAGATE</span>
+    <span class="brand">WESTERN DIGITAL</span>
+    <span class="brand">3COM</span>
+    <span class="brand">CREATIVE</span>
+    <span class="brand">ADAPTEC</span>
+    <span class="brand">MATROX</span>
+  </div>
+</div>
+
+<!-- NEWSLETTER -->
+<section class="newsletter">
+  <h2>ÚNETE AL CLUB RETRO</h2>
+  <p>Noticias de stock, tutoriales de upgrade y ofertas exclusivas para coleccionistas.</p>
+  <div class="newsletter-form">
+    <input type="email" placeholder="tu@email.com">
+    <button>SUSCRIBIR</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="#" class="logo">RETRO<span>CORE</span></a>
+      <p class="footer-tagline">
+        Especialistas en hardware vintage desde 2015.<br>
+        Damos segunda vida a las máquinas que construyeron la era digital.
+      </p>
+      <div class="footer-social">
+        <a href="#" class="social-btn">𝕏</a>
+        <a href="#" class="social-btn">in</a>
+        <a href="#" class="social-btn">▶</a>
+        <a href="#" class="social-btn">dc</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>TIENDA</h4>
+      <ul>
+        <li><a href="#">Todos los productos</a></li>
+        <li><a href="#">Novedades</a></li>
+        <li><a href="#">Ofertas</a></li>
+        <li><a href="#">Packs de upgrade</a></li>
+        <li><a href="#">Hardware NOS</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>SOPORTE</h4>
+      <ul>
+        <li><a href="#">Guías de instalación</a></li>
+        <li><a href="#">Compatibilidad</a></li>
+        <li><a href="#">Foro de la comunidad</a></li>
+        <li><a href="#">Devoluciones</a></li>
+        <li><a href="#">Contacto</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>RECURSOS</h4>
+      <ul>
+        <li><a href="#">Base de datos retro</a></li>
+        <li><a href="#">Drivers antiguos</a></li>
+        <li><a href="#">Blog técnico</a></li>
+        <li><a href="#">Galería de builds</a></li>
+        <li><a href="#">Newsletter</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2024 RETROCORE. ALL RIGHTS RESERVED.</span>
+    <span style="color: var(--green-dim); font-size:0.6rem">SYS.VERSION 2.1.4 // BUILD 20241015 // STATUS: <span style="color:var(--green)">ONLINE ●</span></span>
+  </div>
+</footer>
+
+<script>
+  // Compatibility checker
+  function checkCompat() {
+    const arch = document.getElementById('arch').value;
+    const bus  = document.getElementById('bus').value;
+    const stor = document.getElementById('storage').value;
+    const os   = document.getElementById('os').value;
+    const res  = document.getElementById('compatResult');
+
+    if (!arch && !bus && !stor && !os) {
+      res.innerHTML = '> ERROR: Selecciona al menos un parámetro.';
+      res.classList.add('show');
+      return;
+    }
+
+    let upgrades = [];
+    if (stor.includes('IDE') || stor.includes('PATA')) {
+      upgrades.push('✓ ADAPTADOR IDE→CF + SSD CompactFlash');
+      upgrades.push('✓ ADAPTADOR IDE→SATA para SSDs modernos');
+    }
+    if (stor.includes('SCSI')) {
+      upgrades.push('✓ ADAPTADOR SCSI→SATA — emulador BlueSCSI');
+    }
+    if (bus.includes('PCI')) {
+      upgrades.push('✓ TARJETA DE RED Gigabit PCI');
+      upgrades.push('✓ TARJETA USB 2.0 PCI (4 puertos)');
+      upgrades.push('✓ TARJETA DE SONIDO PCI');
+    }
+    if (bus.includes('ISA')) {
+      upgrades.push('✓ NE2000 compatible ISA — red 10Mbps');
+      upgrades.push('✓ TARJETA I/O ISA multi-función');
+    }
+    if (bus.includes('AGP')) {
+      upgrades.push('✓ RADEON 9250 AGP 128MB — mejor gráfica AGP disponible');
+    }
+    if (arch.includes('486') || arch.includes('Pentium')) {
+      upgrades.push('✓ COOLER de baja perfil con pasta térmica incluida');
+      upgrades.push('✓ RAM EDO 72-pin hasta 128MB');
+    }
+    if (os && os.includes('DOS')) {
+      upgrades.push('✓ TARJETA DE RED NE2000 con drivers DOS incluidos');
+    }
+
+    if (upgrades.length === 0) {
+      upgrades.push('> Sistema analizado. Consulta manual de compatibilidad específica.');
+    }
+
+    res.innerHTML = `> ANÁLISIS COMPLETADO PARA: ${arch || 'N/A'}<br><br>${upgrades.join('<br>')}`;
+    res.classList.add('show');
+  }
+
+  // Cart button mock
+  const addBtns = document.querySelectorAll('.btn-add');
+  let cartCount = 0;
+  addBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      cartCount++;
+      document.querySelector('.btn-cart').textContent = `🛒 CARRITO [${cartCount}]`;
+      btn.textContent = '✓ AGREGADO';
+      btn.style.background = 'var(--green)';
+      btn.style.color = 'var(--bg)';
+      setTimeout(() => {
+        btn.textContent = '+ AGREGAR';
+        btn.style.background = '';
+        btn.style.color = '';
+      }, 1500);
+    });
+  });
+
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.animation = 'fadeInUp 0.6s ease both';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.product-card, .cat-card, .why-point, .stat-box')
+    .forEach(el => observer.observe(el));
+</script>
 </body>
 </html>
